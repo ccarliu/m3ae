@@ -1,3 +1,3 @@
 # m3ae
 
-## The code will coming soon.
+## The code will come soon.
