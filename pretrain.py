@@ -14,15 +14,13 @@ from monai.data import decollate_batch
 from torch.autograd import Variable
 from torch.utils.tensorboard import SummaryWriter
 
-from config import get_config, get_brats_folder_20, get_brats_folder
-from dataset.brats import get_datasets, get_datasets_valid, get_datasets_train, get_datasets_train_smu, get_datasets_train_rf_forpretrain, get_datasets_brats20_rf
+from dataset.brats import get_datasets_train_rf_forpretrain, get_datasets_brats20_rf
 from loss import EDiceLoss
 from loss.dice import EDiceLoss_Val
 from utils import AverageMeter, ProgressMeter, save_checkpoint, reload_ckpt_bis, reload_ckpt, \
     count_parameters, save_metrics, save_args_1, inference, post_trans, dice_metric, \
     dice_metric_batch
-from vtunet.vision_transformer import VTUNet as ViT_seg
-from vtunet.Unet import Unet_missing
+from model.Unet import Unet_missing
 
 from torch.cuda.amp import autocast as autocast
 
@@ -30,7 +28,7 @@ torch.backends.cudnn.benchmark = False
 torch.backends.cudnn.enabled = False
 #torch.cuda.set_device(0)
 
-parser = argparse.ArgumentParser(description='VTUNET BRATS 2021 Training')
+parser = argparse.ArgumentParser(description='')
 # DO not use data_aug argument this argument!!
 parser.add_argument('-j', '--workers', default=12, type=int, metavar='N',
                     help='number of data loading workers (default: 2).')
@@ -81,7 +79,7 @@ def main(args):
     ngpus = torch.cuda.device_count()
     print(f"Working with {ngpus} GPUs")
 
-    args.save_folder_1 = pathlib.Path(f"/apdcephfs/share_1290796/lh/brats/runs/{args.exp_name}/model_1")
+    args.save_folder_1 = pathlib.Path(f"./runs/{args.exp_name}/model_1")
     args.save_folder_1.mkdir(parents=True, exist_ok=True)
     args.seg_folder_1 = args.save_folder_1 / "segs"
     args.seg_folder_1.mkdir(parents=True, exist_ok=True)
@@ -90,7 +88,7 @@ def main(args):
     
     
     t_writer_1 = SummaryWriter(str(args.save_folder_1))
-    args.checkpoint_folder = pathlib.Path(f"/apdcephfs/share_1290796/lh/brats/runs{args.exp_name}/model_1")
+    args.checkpoint_folder = pathlib.Path(f"./runs{args.exp_name}/model_1")
 
     model_1 = Unet_missing(input_shape = [128,128,128], pre_train = True, mask_ratio = args.mask_ratio, mdp = args.mdp)
     
@@ -238,5 +236,5 @@ def main(args):
 
 if __name__ == '__main__':
     arguments = parser.parse_args()
-    os.environ['CUDA_VISIBLE_DEVICES'] = arguments.devices
+    #os.environ['CUDA_VISIBLE_DEVICES'] = arguments.devices
     main(arguments)

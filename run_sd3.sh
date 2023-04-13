@@ -1,5 +1,2 @@
-#CUDA_VISIBLE_DEVICES=1,2 python3 -u train_18_selfdill_withaug.py --batch-size 2 --lr 0.0003 --model_type cnnnet --part 0.1 --all_data True --semi_proportion 0.2 --seed 500 --weight_kl 0.1 --feature_level 2 --epochs 300 --mdp 3 --val 20 --wd 0.0001 --deep_supervised True --patch_shape 128 --exp_name repro_fine01_without_weight_semi02 >> repro_fine01_without_weight_semi02.txt
-CUDA_VISIBLE_DEVICES=1,2 python3 -u train_18_selfdill_withaug.py --batch-size 2 --lr 0.0003 --model_type cnnnet --part 0.1 --all_data True --semi_proportion 0.2 --seed 500 --weight_kl 0.1 --feature_level 2 --epochs 300 --mdp 3 --val 20 --wd 0.0001 --deep_supervised True --patch_shape 128 --exp_name test1 >> test1.txt
-
-# CUDA_VISIBLE_DEVICES=2 python3 -u train_18_test.py --batch-size 2 --lr 0.0003 --model_type cnnnet --seed 500 --weight_kl 0 --feature_level 2 --epochs 300 --mdp 3 --val 1 --wd 0.0001 --deep_supervised True --patch_shape 112 --exp_name ours_init16_epoch300_rf_mr875mdp3_weight0 # test for para calculate
+CUDA_VISIBLE_DEVICES=1,2 python3 -u train_18_selfdill_withaug.py --batch-size 2 --lr 0.0003 --model_type cnnnet --seed 500 --weight_kl 0.1 --feature_level 2 --epochs 300 --mdp 3 --val 20 --wd 0.0001 --deep_supervised True --patch_shape 128 --exp_name test1
  

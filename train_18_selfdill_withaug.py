@@ -16,20 +16,18 @@ from torch.utils.tensorboard import SummaryWriter
 from torch.nn import functional as F
 import csv
 
-from config import get_config
-from dataset.brats import get_datasets, get_datasets_valid, get_datasets_train, get_datasets_train_smu, get_datasets_train_smu_withvalid, get_datasets_train_rf_withvalid
+from dataset.brats import get_datasets_train_rf_withvalid
 from loss import EDiceLoss
 from loss.dice import EDiceLoss_Val
 from utils import AverageMeter, ProgressMeter, save_checkpoint, reload_ckpt_bis, \
     count_parameters, save_metrics, save_args_1, inference, post_trans, dice_metric, \
     dice_metric_batch
-from vtunet.vision_transformer import VTUNet as ViT_seg
-from vtunet.Unet import Unet_missing
+from model.Unet import Unet_missing
 
 from torch.cuda.amp import autocast as autocast
 
 from dataset.transforms import *
-from vtunet.mask_utils import MaskEmbeeding1
+from model.mask_utils import MaskEmbeeding1
 
 
 torch.backends.cudnn.benchmark = False
@@ -156,46 +154,28 @@ def main(args):
     args.checkpoint_folder = pathlib.Path(f"/apdcephfs/share_1290796/lh/brats/runs/{args.exp_name}/model_1")
 
     print(args)
+
+
+    model_1 = Unet_missing(input_shape = [128,128,128], init_channels = 16, out_channels=3, mdp=3, pre_train = False, deep_supervised = args.deep_supervised, patch_shape = args.patch_shape)
     
-    # Create model
-    with open(args.cfg, 'r') as f:
-        yaml_cfg = yaml.load(f, Loader=yaml.FullLoader)
 
-    config = get_config(args)
-    if args.model_type == "vtnet":
-        model_1 = ViT_seg(config, num_classes=args.num_classes,
-                      embed_dim=yaml_cfg.get("MODEL").get("SWIN").get("EMBED_DIM"),
-                      win_size=yaml_cfg.get("MODEL").get("SWIN").get("WINDOW_SIZE"), pre_train = False, mdp = args.mdp).cuda()
-                      
-        temp_model = ViT_seg(config, num_classes=4,
-                      embed_dim=yaml_cfg.get("MODEL").get("SWIN").get("EMBED_DIM"),
-                      win_size=yaml_cfg.get("MODEL").get("SWIN").get("WINDOW_SIZE"), pre_train = True, mdp = args.mdp)
-        args.checkpoint = "/apdcephfs/share_1290796/lh/brats/runs/vt_base_875/model_1model_best_599.pth.tar"
-        reload_ckpt_bis(args.checkpoint, model_1, temp_model)
-        model_1 = nn.DataParallel(model_1).cuda()
-        model_1.module.raw_input = model_1.module.swin_unet.raw_input.cpu()
-        model_1.module.limage = model_1.module.swin_unet.limage
-    else:
-        model_1 = Unet_missing(input_shape = [128,128,128], init_channels = 16, out_channels=3, mdp=3, pre_train = False, deep_supervised = args.deep_supervised, patch_shape = args.patch_shape)
-        
+    args.checkpoint = "/apdcephfs/share_1290796/lh/brats/runs/our_pre_18_re_mdp3/model_1model_best_599.pth.tar"
+    
+    
+    ck = torch.load(args.checkpoint, map_location=torch.device('cpu'))
+    del ck['state_dict']['module.unet.up1conv.weight']
+    del ck['state_dict']['module.unet.up1conv.bias']
 
-        args.checkpoint = "/apdcephfs/share_1290796/lh/brats/runs/our_pre_18_re_mdp3/model_1model_best_599.pth.tar"
-        
-        
-        ck = torch.load(args.checkpoint, map_location=torch.device('cpu'))
-        del ck['state_dict']['module.unet.up1conv.weight']
-        del ck['state_dict']['module.unet.up1conv.bias']
-
-        
-        model_1 = nn.DataParallel(model_1)
-        
-        model_1.load_state_dict(ck['state_dict'], strict=False)
-        model_1 = model_1.module
-        
-        model_1 = nn.DataParallel(model_1)
-        model_1 = model_1.cuda()
-        #model_1.module.limage = model_1.module.limage.cpu()
-        model_1.module.raw_input = model_1.module.raw_input.cpu()
+    
+    model_1 = nn.DataParallel(model_1)
+    
+    model_1.load_state_dict(ck['state_dict'], strict=False)
+    model_1 = model_1.module
+    
+    model_1 = nn.DataParallel(model_1)
+    model_1 = model_1.cuda()
+    #model_1.module.limage = model_1.module.limage.cpu()
+    model_1.module.raw_input = model_1.module.raw_input.cpu()
     
     print(f"total number of trainable parameters {count_parameters(model_1)}")
 
@@ -397,7 +377,6 @@ def main(args):
                     print("NaN in model loss!!")
                 
                 
-                print(kl_loss.avg)
                 t_writer_1.add_scalar(f"Loss/{mode}{''}",
                                       loss_.item(),
                                       global_step=batch_per_epoch * epoch + i)
