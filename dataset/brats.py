@@ -13,8 +13,8 @@ from dataset.image_utils import pad_or_crop_image, irm_min_max_preprocess, zscor
 from dataset.transforms import *
 
 user = "LH"
-BRATS_TRAIN_FOLDERS='/apdcephfs/share_1290796/lh/2-MICCAI_BraTS_2018/MICCAI_BraTS_2018_Data_Training'
-TEST_FOLDER='/apdcephfs/share_1290796/lh/2-MICCAI_BraTS_2018/MICCAI_BraTS_2018_Data_Validation'
+BRATS_TRAIN_FOLDERS='/yourpath/2-MICCAI_BraTS_2018/MICCAI_BraTS_2018_Data_Training'
+TEST_FOLDER='/yourpath/2-MICCAI_BraTS_2018/MICCAI_BraTS_2018_Data_Validation'
 BRATS_TRAIN_FOLDERS_20='Path of your brats dataset'
 
 
