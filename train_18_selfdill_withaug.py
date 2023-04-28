@@ -114,12 +114,10 @@ def KL_loss(pred1, pred2):
     entropy1 = -1 * sigmoid1.detach() * torch.log(sigmoid1.detach())
     entropy2 = -1 * sigmoid2.detach() * torch.log(sigmoid2.detach())
     
-    #print(entropy1.max(), entropy1.min())
     
     weight = entropy1 - entropy2
     weight[weight < 0] = 0
-    #print(weight.min(), weight.max())
-    #print(kl_loss.mean())
+
     
     kl_loss = kl_loss * weight
     
@@ -344,10 +342,9 @@ def main(args):
                         #F.Upsample(style[args.feature_level][0], scale_factor=8, mode='trilinear', align_corners=True)
                         loss_kl = (F.mse_loss(style[args.feature_level][0], style[args.feature_level][1], reduction = "none") * weight).mean()
                     elif not args.use_weight:
-                        #print("dd")
                         loss_kl = F.mse_loss(style[args.feature_level+1][0], style[args.feature_level+1][1], reduction = "none").mean()
-                        loss_kl += (F.mse_loss(style[-1][0], style[-1][1].detach(), reduction = "none").mean((1,2,3)) * (mean_results[mask_codes[0], :] / mean_results[mask_codes[1], :]).to(style[-1].device)).mean() #* mean_results[mask_codes[0]] / mean_results[mask_codes[1]]  
-                        loss_kl += (F.mse_loss(style[-1][0].detach(), style[-1][1], reduction = "none").mean((1,2,3)) * (mean_results[mask_codes[1], :] / mean_results[mask_codes[0], :]).to(style[-1].device)).mean() 
+                        #loss_kl += (F.mse_loss(style[-1][0], style[-1][1].detach(), reduction = "none").mean((1,2,3)) * (mean_results[mask_codes[0], :] / mean_results[mask_codes[1], :]).to(style[-1].device)).mean() #* mean_results[mask_codes[0]] / mean_results[mask_codes[1]]  
+                        #loss_kl += (F.mse_loss(style[-1][0].detach(), style[-1][1], reduction = "none").mean((1,2,3)) * (mean_results[mask_codes[1], :] / mean_results[mask_codes[0], :]).to(style[-1].device)).mean() 
                         
 
                     else:
@@ -359,14 +356,12 @@ def main(args):
                     loss_kl /= 6
                     
                 # compute gradient and do SGD step
-                #print(batch[0]["patient_id"])
                 if batch[0]["patient_id"][0] in _labeled_name_list:
                     loss = loss_ + loss_kl * args.weight_kl
-                    #print("aha")
                 else:
                     loss = loss_kl * args.weight_kl
                     
-                loss.backward()  #为了梯度放大
+                loss.backward()  
                 optimizer.step()
                 
                 # measure accuracy and record loss_
