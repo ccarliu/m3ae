@@ -141,7 +141,7 @@ def main(args):
     ngpus = torch.cuda.device_count()
     print(f"Working with {ngpus} GPUs")
 
-    args.save_folder_1 = pathlib.Path(f"/apdcephfs/share_1290796/lh/brats/runs/{args.exp_name}/model_1")
+    args.save_folder_1 = pathlib.Path(f"./runs/{args.exp_name}/model_1")
     args.save_folder_1.mkdir(parents=True, exist_ok=True)
     args.seg_folder_1 = args.save_folder_1 / "segs"
     args.seg_folder_1.mkdir(parents=True, exist_ok=True)
@@ -157,7 +157,7 @@ def main(args):
     model_1 = Unet_missing(input_shape = [128,128,128], init_channels = 16, out_channels=3, mdp=3, pre_train = False, deep_supervised = args.deep_supervised, patch_shape = args.patch_shape)
     
 
-    args.checkpoint = "/apdcephfs/share_1290796/lh/brats/runs/our_pre_18_re_mdp3/model_1model_best_599.pth.tar"
+    args.checkpoint = "The path where pretrain model stored."
     
     
     ck = torch.load(args.checkpoint, map_location=torch.device('cpu'))
