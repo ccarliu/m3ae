@@ -2,7 +2,7 @@
 
 ## The code is preparing in few days.
 
-## Dataset: [Brats 2018](https://www.kaggle.com/datasets/sanglequang/brats2018) and [Brats 2020](https://www.kaggle.com/datasets/awsaf49/brats2020-training-data?resource=download)
+## Dataset: [Brats 2018](https://www.kaggle.com/datasets/sanglequang/brats2018) and [Brats 2020](https://www.kaggle.com/datasets/awsaf49/brats2020-training-data?resource=download) or from [RFnet](https://drive.google.com/drive/folders/1AwLwGgEBQwesIDTlWpubbwqxxd8brt5A?usp=sharing) for dataset and split files.
 
 ## Training process:
 
