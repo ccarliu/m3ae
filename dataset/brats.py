@@ -15,7 +15,7 @@ from dataset.transforms import *
 user = "LH"
 BRATS_TRAIN_FOLDERS='/yourpath/2-MICCAI_BraTS_2018/MICCAI_BraTS_2018_Data_Training'
 TEST_FOLDER='/yourpath/2-MICCAI_BraTS_2018/MICCAI_BraTS_2018_Data_Validation'
-BRATS_TRAIN_FOLDERS_20='Path of your brats dataset'
+BRATS_TRAIN_FOLDERS_20='Path of your brats dataset'  # (*/BRATS2020_Training_none_npy)
 
 
 
@@ -328,19 +328,19 @@ def get_datasets_train_rf_withtest(seed, on="train", fold_number=0, normalisatio
 def get_datasets_brats20_rf(seed, on="train", fold_number=0, normalisation="minmax", part = 1, all_data = False, patch_shape = 128):
     data_root = get_brats_folder_20()
     
-    data_file_path = "/apdcephfs/share_1290796/lh/BRATS2020_Training_none_npy/train.txt"
+    data_file_path = data_root + "/train.txt"
     #train_list = []
     with open(data_file_path, 'r') as f:
         train_list = [i.strip()[3:] for i in f.readlines()]
     train_list.sort()
     
-    data_file_path = "/apdcephfs/share_1290796/lh/BRATS2020_Training_none_npy/val.txt"
+    data_file_path = data_root + "val.txt"
     #train_list = []
     with open(data_file_path, 'r') as f:
         train_list.extend([i.strip()[3:] for i in f.readlines()])
     train_list.sort()
 
-    data_file_path = "/apdcephfs/share_1290796/lh/BRATS2020_Training_none_npy/test.txt"
+    data_file_path = data_root + "test.txt"
     with open(data_file_path, 'r') as f:
         test_list = [i.strip()[3:] for i in f.readlines()]
     test_list.sort()
