@@ -17,15 +17,13 @@ from monai.data import decollate_batch
 from torch.autograd import Variable
 from torch.utils.tensorboard import SummaryWriter
 
-from config import get_config
 from dataset.brats import get_datasets_train_rf_withvalid,get_datasets_train_rf_withtest
 from loss import EDiceLoss
 from loss.dice import EDiceLoss_Val
 from utils import AverageMeter, ProgressMeter, save_checkpoint, reload_ckpt_bis, \
     count_parameters, save_metrics, save_args_1, inference, post_trans, dice_metric, \
     dice_metric_batch, reload_ckpt
-from vtunet.vision_transformer import VTUNet as ViT_seg
-from vtunet.Unet import Unet_missing
+from model.Unet import Unet_missing
 
 from torch.cuda.amp import autocast as autocast
 
@@ -109,10 +107,6 @@ def main(args):
         args.modal_list = []
     
     # Create model
-    with open(args.cfg, 'r') as f:
-        yaml_cfg = yaml.load(f, Loader=yaml.FullLoader)
-
-    config = get_config(args)
     
     model_1 = Unet_missing(input_shape = [128,128,128], out_channels=3, mdp=3, init_channels = 16,  pre_train = False, mask_modal = args.modal_list, patch_shape = 128)
 
@@ -176,12 +170,7 @@ def main(args):
     #print("Bench Test dataset number of batch:", len(bench_loader))
 
     # Actual Train loop
-    best_1 = 0.0
     patients_perf = []
-
-    scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, args.epochs)
-    
-    best_loss = 10000000
         
     
 
@@ -311,16 +300,9 @@ def step(data_loader, model, model_temp, criterion: EDiceLoss_Val, metric, epoch
                 hd95.append(0)
                 dice.append(metric_[0][l].cpu().numpy())
                 continue
-            hd.append(binary.hd(segs[0,l].cpu().numpy() > 0.5, targets[0,l].cpu().numpy() > 0.5, voxelspacing=None))
-            #hd95
-            hd95.append(binary.hd95(segs[0,l].cpu().numpy() > 0.5, targets[0,l].cpu().numpy() > 0.5, voxelspacing=None))
-            
-            dice.append(metric_[0][l].cpu().numpy())
-            
         hd_metric.append(hd)
         hd95_metric.append(hd95)
         odice_metric.append(dice)
-        #exit(0)
         
         # measure elapsed time
         batch_time.update(time.perf_counter() - end)
@@ -335,14 +317,12 @@ def step(data_loader, model, model_temp, criterion: EDiceLoss_Val, metric, epoch
     dice_metric.reset()
     dice_metric_batch.reset()
     
-    #print(metrics)
     metricss = list(zip(*metrics))
     metrics = [np.nanmean(torch.tensor(dice, device="cpu").numpy()) for dice in metricss]
     stds = [np.nanstd(torch.tensor(dice, device="cpu").numpy()) for dice in metricss]
     # print(stds)
     labels = ("ET", "TC", "WT")
     #metrics = {key: value for key, value in zip(labels, metrics)}
-    #print(metrics)
     
     hd_metric = [np.nanmean(l) for l in zip(*hd_metric)]
     hd95_metric = [np.nanmean(l) for l in zip(*hd95_metric)]
