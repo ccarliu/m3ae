@@ -274,11 +274,6 @@ def step(data_loader, model, model_temp, criterion: EDiceLoss_Val, metric, epoch
                           loss_.item(),
                           global_step=batch_per_epoch * epoch + i)
 
-        # measure accuracy and record loss_
-        #if not np.isnan(loss_.item()):
-        #    losses.update(loss_.item())
-        #else:
-        #    print("NaN in model loss!!")
 
         metric_ = metric(segs, targets)
         metrics.extend(metric_)
@@ -291,15 +286,20 @@ def step(data_loader, model, model_temp, criterion: EDiceLoss_Val, metric, epoch
                 hd.append(1)
                 hd95.append(0)
                 dice.append(metric_[0][l].cpu().numpy())
-                print("xxk")
                 print((segs[0,l].cpu().numpy() > 0.5).sum())
                 
                 continue
-            if (segs[0,l].cpu().numpy() > 0.5).sum() == 0 or True:
+            if (segs[0,l].cpu().numpy() > 0.5).sum() == 0:
                 hd.append(0)
                 hd95.append(0)
                 dice.append(metric_[0][l].cpu().numpy())
                 continue
+
+            hd.append(binary.hd(segs[0,l].cpu().numpy() > 0.5, targets[0,l].cpu().numpy() > 0.5, voxelspacing=None))
+            #hd95
+            hd95.append(binary.hd95(segs[0,l].cpu().numpy() > 0.5, targets[0,l].cpu().numpy() > 0.5, voxelspacing=None))
+            
+            dice.append(metric_[0][l].cpu().numpy())
         hd_metric.append(hd)
         hd95_metric.append(hd95)
         odice_metric.append(dice)
@@ -329,10 +329,10 @@ def step(data_loader, model, model_temp, criterion: EDiceLoss_Val, metric, epoch
     dice_std = [np.nanstd(l) for l in zip(*odice_metric)]
     dice_mean = [np.nanmean(l) for l in zip(*odice_metric)]
     
-    print([l for l in zip(*odice_metric)])
-    print(hd_metric)
-    print(hd95_metric)
-    print(dice_std)
+    # print([l for l in zip(*odice_metric)])
+    print("hd: ", hd_metric)
+    print("hd_95: ", hd95_metric)
+    print("dice_std:", dice_std)
     
     file = open("smu2.csv", "a+")
     csv_writer = csv.writer(file)
