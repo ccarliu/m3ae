@@ -18,7 +18,7 @@ from torch.autograd import Variable
 from torch.utils.tensorboard import SummaryWriter
 
 from config import get_config
-from dataset.brats import get_datasets, get_datasets_valid, get_datasets_train,   get_datasets_train_smu, get_datasets_train_rf_withvalid,get_datasets_train_rf_withtest
+from dataset.brats import get_datasets_train_rf_withvalid,get_datasets_train_rf_withtest
 from loss import EDiceLoss
 from loss.dice import EDiceLoss_Val
 from utils import AverageMeter, ProgressMeter, save_checkpoint, reload_ckpt_bis, \
@@ -164,7 +164,7 @@ def main(args):
     if args.val != 0:
         full_train_dataset, l_val_dataset, _, _ = get_datasets_train_rf_withvalid(args.seed, fold_number=args.fold)
     else:
-        full_train_dataset, l_val_dataset = get_datasets_train(args.seed, fold_number=args.fold)
+        full_train_dataset, l_val_dataset, _, _ = get_datasets_train_rf_withtest(args.seed, fold_number=args.fold)
     train_loader = torch.utils.data.DataLoader(full_train_dataset, batch_size=args.batch_size, shuffle=True,
                                                num_workers=args.workers, pin_memory=True, drop_last=True)
     val_loader = torch.utils.data.DataLoader(l_val_dataset, batch_size=1, shuffle=False,
