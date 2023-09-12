@@ -818,9 +818,14 @@ class Unet_missing(nn.Module):
             x = x * mask + self.limage[:, :, :128, :128, :128] * (1-mask)
             
         elif self.pre_train and self.training:
-        
-            mask = MaskEmbeeding2(x.shape[0], mask_ratio = self.mask_ratio, raw_input = self.raw_input.to(x.device), mdp = self.mdp, mask = True)
-            x = x * mask + self.limage[:,:,location[0][0]: location[0][1],location[1][0]: location[1][1],location[2][0]: location[2][1]] * (1-mask) # not detach here
+            # print(location, x.shape)
+            if x.shape == 1:
+                mask = MaskEmbeeding2(1, mask_ratio = self.mask_ratio, raw_input = self.raw_input.to(x.device), mdp = self.mdp, mask = True)
+                x[l] = x[l] * mask + self.limage[:,:,location[0][0]: location[0][1],location[1][0]: location[1][1],location[2][0]: location[2][1]] * (1-mask) # not detach here
+            else:
+                for l in range(x.shape[0]):
+                    mask = MaskEmbeeding2(1, mask_ratio = self.mask_ratio, raw_input = self.raw_input.to(x.device), mdp = self.mdp, mask = True)
+                    x[l] = x[l] * mask + self.limage[:, :, location[0][0][l]: location[0][1][l], location[1][0][l]: location[1][1][l], location[2][0][l]: location[2][1][l]] * (1-mask) # not detach here
             
         elif self.mdp != 0 and self.training:
 
