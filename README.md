@@ -8,6 +8,6 @@
 
 1. change the path in ./dataset/brats.py to your dataset path.
 2. run pretrain.py via pre.sh.
-3. change the pretrained chackpoint path in train_18.py and run it via run_finetune.py
+3. change the pretrained chackpoint path in train_18.py and run it via run.py
 
 ## If you have any questions, please do not hesitate to contact liuhong@stu.xmu.edu.cn
