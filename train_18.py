@@ -56,7 +56,7 @@ parser.add_argument('--use_weight', action='store_true', help='use zipped datase
 parser.add_argument('--wd', '--weight-decay', default=0.00001, type=float,
                     metavar='W', help='weight decay (default: 0)',
                     dest='weight_decay')
-parser.add_argument('--model_type', type=str, default='vtnet', choices=['vtnet', 'cnnnet'])
+parser.add_argument('--model_type', type=str, default='cnnnet', choices=['vtnet', 'cnnnet'])
 parser.add_argument('--feature_level', default=2, type=int, metavar='N', help='mini-batch size (default: 1)')
 
 parser.add_argument('--devices', default='0', type=str, help='Set the CUDA_VISIBLE_DEVICES env var from this string')
