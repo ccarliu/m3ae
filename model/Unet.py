@@ -819,14 +819,13 @@ class Unet_missing(nn.Module):
             
         elif self.pre_train and self.training:
             # print(location, x.shape)
-            if x.shape == 1:
+       
+            x_new = []
+            for l in range(x.shape[0]):
                 mask = MaskEmbeeding2(1, mask_ratio = self.mask_ratio, raw_input = self.raw_input.to(x.device), mdp = self.mdp, mask = True)
-                x[l] = x[l] * mask + self.limage[:,:,location[0][0]: location[0][1],location[1][0]: location[1][1],location[2][0]: location[2][1]] * (1-mask) # not detach here
-            else:
-                for l in range(x.shape[0]):
-                    mask = MaskEmbeeding2(1, mask_ratio = self.mask_ratio, raw_input = self.raw_input.to(x.device), mdp = self.mdp, mask = True)
-                    x[l] = x[l] * mask + self.limage[:, :, location[0][0][l]: location[0][1][l], location[1][0][l]: location[1][1][l], location[2][0][l]: location[2][1][l]] * (1-mask) # not detach here
-            
+                x_new.append(x[l] * mask + self.limage[:, :, location[0][0][l]: location[0][1][l], location[1][0][l]: location[1][1][l], location[2][0][l]: location[2][1][l]] * (1-mask) )# not detach here
+            x = torch.cat(x_new)
+                
         elif self.mdp != 0 and self.training:
 
             if fmdp == None:              # in finetune, the x inputed is already do the data augmentation and masking. so no need mask again
