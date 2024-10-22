@@ -10,4 +10,8 @@
 2. run pretrain.py via pre.sh.
 3. change the pretrained chackpoint path in train_18.py and run it via run.py
 
+## pretrained model:
+link：https://pan.baidu.com/s/15gEXbc4CSbRHgdgtihS_dQ?pwd=o9mb
+key：o9mb
+
 ## If you have any questions, please do not hesitate to contact liuhong@stu.xmu.edu.cn
